@@ -1,6 +1,7 @@
 package edu.nyu.nyuvis.cfutils.db.elasticsearch;
 
 import com.google.gson.JsonObject;
+import edu.nyu.nyuvis.cfutils.JSON;
 import java.util.function.Consumer;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -29,7 +30,12 @@ public class Index {
     }
     
     public Index(String type, String index, String cluster, String server, int port){
+        this(type, index, cluster, server, port, "");
+    }
+    
+    public Index(String type, String index, String cluster, String server, int port, String auth){
         Settings settings = ImmutableSettings.settingsBuilder()
+            .put("shield.user", auth)    
             .put("cluster.name", cluster).build();
          client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(server, port));
          this.index = index;
@@ -75,7 +81,11 @@ public class Index {
         return response;
     }
     
-    public void forEach(Consumer action, int limit){
+    public void forEach(Consumer<JsonObject> action){
+        forEach(action, Integer.MAX_VALUE);
+    }
+    
+    public void forEach(Consumer<JsonObject> action, int limit){
         SearchResponse scrollResp = this.client.prepareSearch(this.index)
             .setSearchType(SearchType.SCAN)
             .setScroll(new TimeValue(60000))
@@ -89,7 +99,8 @@ public class Index {
                     return;
                 }
                 count++;
-                action.accept(hit.getSource());
+                
+                action.accept(JSON.getObject(hit.getSourceAsString()));
             }
             scrollResp = this.client.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(600000)).execute().actionGet();
             

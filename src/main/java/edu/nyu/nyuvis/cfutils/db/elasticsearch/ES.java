@@ -59,7 +59,7 @@ public class ES {
                 limit = Integer.parseInt(properties.getProperty("limit"));
             
             System.out.println("Exporting to " + file);
-            writer = new PrintWriter(file, "UTF-16");
+            writer = new PrintWriter(file, "UTF-8");
             
             index.forEach(d -> {
                 writer.println(JSON.toJson(d));
@@ -161,7 +161,7 @@ public class ES {
         Integer Port = Integer.parseInt(p.getProperty(prefix + "Port"));
         String  Index = p.getProperty(prefix + "Index");
         String  Type = p.getProperty(prefix + "Type");
-        
+        String  auth = p.getProperty(prefix + "Auth");
         Index from = new Index(Type, Index, Cluster, Host, Port);
         return from;
     }
