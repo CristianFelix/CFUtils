@@ -163,7 +163,7 @@ public class ES {
         String  Type = p.getProperty(prefix + "Type");
         String  auth = p.getProperty(prefix + "Auth");
         System.out.println(auth);
-        Index from = new Index(Type, Index, Cluster, Host, Port, auth);
+        Index from = new Index(Type, Index, Cluster, Host, Port);
         
         return from;
     }
