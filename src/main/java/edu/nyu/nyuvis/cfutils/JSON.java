@@ -31,6 +31,29 @@ public class JSON {
         return json;
     }
     
+    public static void print(String s){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonParser jp = new JsonParser();
+        JsonElement je = jp.parse(s);
+        String prettyJsonString = gson.toJson(je);
+        Utils.out(prettyJsonString);
+    }
+    
+    public static JsonElement getProp(JsonObject obj, String path){
+        String[] parts = path.split("\\.");
+        JsonElement current = obj;
+        for(String part: parts){
+            current = current.getAsJsonObject().get(part);
+        }
+        return current;
+    }
+    
+    public static void print(JsonObject s){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String prettyJsonString = gson.toJson(s);
+        Utils.out(prettyJsonString);
+    }
+    
     public static JsonObject fromFile(String file){
         JsonObject jsonObject = new JsonObject();
 

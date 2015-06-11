@@ -85,7 +85,7 @@ public class ES {
     {
         System.out.println("Starting");
         Index index = ES.getIndex(properties);
-        //index.create(JSON.fromFile(properties.getProperty("settings")));
+        index.create(JSON.fromFile(properties.getProperty("settings")));
         
         String file = properties.getProperty("file");
         Integer limit = Integer.MAX_VALUE;
@@ -109,7 +109,7 @@ public class ES {
                     public void afterBulk(long executionId,
                             BulkRequest request,
                             BulkResponse response) {
-                        
+                        System.out.println(response.getItems()[0].getFailureMessage());
                     }
 
                     @Override
@@ -119,9 +119,10 @@ public class ES {
                         System.out.println("Bulked failure");
                         failure.printStackTrace();
                     }
+                    
 
             })
-            .setBulkActions(1000)
+            .setBulkActions(100)
             .setBulkSize(new ByteSizeValue(1, ByteSizeUnit.GB))
             .setFlushInterval(TimeValue.timeValueSeconds(5))
             .setConcurrentRequests(1)
@@ -132,18 +133,17 @@ public class ES {
         if(properties.containsKey("charset"))
             charset = Charset.forName(properties.getProperty("charset"));
         
-        System.out.println(charset);
-        
         try (Stream<String> lines = Files.lines(path, charset)) {
-            lines.limit(limit).forEach((String line) -> {
+            lines.skip(0).limit(limit).forEach((String line) -> {
                 Processor.add(new IndexRequest(index.index, index.type).source(line));
                 count[0]++;
             });
+            Processor.flush();
         } catch (Exception ex){
             ex.printStackTrace();
                 System.err.println("Line: " + count[0] + "\n" + ex.getMessage());
         }
-        Processor.flush();
+        
     }
     
     
