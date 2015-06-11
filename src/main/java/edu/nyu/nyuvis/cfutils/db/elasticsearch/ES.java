@@ -85,7 +85,7 @@ public class ES {
     {
         System.out.println("Starting");
         Index index = ES.getIndex(properties);
-        index.create(JSON.fromFile(properties.getProperty("settings")));
+        //index.create(JSON.fromFile(properties.getProperty("settings")));
         
         String file = properties.getProperty("file");
         Integer limit = Integer.MAX_VALUE;
